@@ -1,2 +1,8 @@
 # CFOLD_ACT
-Two-step ACT model for cloth folding
+
+Plan: Two-step cloth folding action-chunking transformer for 11/18 demo
+
+Architecture:  
+- ACT policy for cloth half fold
+- State machine for step checking and fold verification
+- ACT policy for cloth half to quarter fold

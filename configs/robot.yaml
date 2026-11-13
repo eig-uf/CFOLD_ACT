@@ -1,0 +1,72 @@
+# Ports are placeholders. Prefer /dev/serial/by-id and /dev/v4l/by-path.
+# Optional calibration_ids select existing files independently of the group ID.
+robot:
+  type: bi_so_follower
+  id: cfold_follower
+  calibration_dir: null
+  calibration_ids:
+    left: cfold_follower_left
+    right: cfold_follower_right
+  left_arm_config:
+    port: /dev/ttyACM0
+    disable_torque_on_disconnect: false
+    use_degrees: true
+    max_relative_target: 3.0
+  right_arm_config:
+    port: /dev/ttyACM1
+    disable_torque_on_disconnect: false
+    use_degrees: true
+    max_relative_target: 3.0
+teleop:
+  type: bi_so_leader
+  id: cfold_leader
+  calibration_dir: null
+  calibration_ids:
+    left: cfold_leader_left
+    right: cfold_leader_right
+  left_arm_config:
+    port: /dev/ttyACM2
+  right_arm_config:
+    port: /dev/ttyACM3
+cameras:
+  overhead:
+    model: Logitech C922 Pro
+    arm: left
+    index_or_path: /dev/video0
+    width: 640
+    height: 480
+    fps: 30
+    fourcc: MJPG
+    rotation: 0
+  left_wrist:
+    model: InnoMaker U20CAM-1080P
+    arm: left
+    index_or_path: /dev/video2
+    width: 640
+    height: 480
+    fps: 30
+    fourcc: MJPG
+    rotation: 0
+  right_wrist:
+    model: InnoMaker U20CAM-1080P
+    arm: right
+    index_or_path: /dev/video4
+    width: 640
+    height: 480
+    fps: 30
+    fourcc: MJPG
+    rotation: 0
+control:
+  fps: 30
+safety:
+  # Example limits only: validate geometry and units on the real apparatus.
+  max_step: 3.0
+  camera_max_age_s: 0.25
+  action_max_age_s: 2.0
+  joint_limits:
+    shoulder_pan.pos: [-90, 90]
+    shoulder_lift.pos: [-90, 90]
+    elbow_flex.pos: [-90, 90]
+    wrist_flex.pos: [-90, 90]
+    wrist_roll.pos: [-180, 180]
+    gripper.pos: [0, 100]

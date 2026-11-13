@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=71"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cfold-act"
+version = "0.1.0"
+requires-python = ">=3.11,<3.13"
+dependencies = ["lerobot[feetech]==0.4.4", "torch==2.7.1", "torchvision==0.22.1", "torchcodec==0.5", "PyYAML>=6,<7", "numpy>=1.26,<3"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

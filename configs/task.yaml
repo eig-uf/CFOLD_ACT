@@ -1,0 +1,26 @@
+task:
+  name: bimanual_cloth_folding
+  control_fps: 30
+  device: cpu
+  local_files_only: true
+  evaluation_log: logs/attempts.jsonl
+stages:
+  - name: fold_1
+    checkpoint: checkpoints/fold1
+    dataset: ufeig/cfold-fold1-v1
+    # Export meta/info.json beside each checkpoint for offline motor-name mapping.
+    metadata: checkpoints/fold1/dataset_info.json
+    n_action_steps: 30
+    duration_s: 12
+    timeout_s: 20
+    max_actions: null
+    verify: true
+  - name: fold_2
+    checkpoint: checkpoints/fold2
+    dataset: ufeig/cfold-fold2-v1
+    metadata: checkpoints/fold2/dataset_info.json
+    n_action_steps: 30
+    duration_s: 12
+    timeout_s: 20
+    max_actions: null
+    verify: true

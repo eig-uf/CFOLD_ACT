@@ -145,20 +145,32 @@ choose CPU, for example `DEVICE=cpu STEPS=10 bash scripts/train_fold1.sh`.
 Training also needs a dataset and may download pretrained backbone weights;
 these data and downloads are separate from installing dependencies.
 
-### Command-line Docker usage
+## Develop on Linux without VS Code
 
-VS Code is optional. From Linux/WSL, build and test the same image:
+Use any host editor (for example Vim, Emacs, or your preferred IDE) and run Python
+commands inside Docker. Only Git and Docker are required on the host; VS Code,
+the Dev Containers extension, host Python, and host uv are optional.
+
+Clone the repository and enter its root directory, or use your existing checkout:
 
 ```bash
-docker build --build-arg USER_UID="$(id -u)" --build-arg USER_GID="$(id -g)" -t cfold-act:dev .
-docker run --rm cfold-act:dev python --version
-docker run --rm cfold-act:dev uv --version
-docker run --rm cfold-act:dev uv run --locked --extra test pytest
+git clone https://github.com/eig-uf/CFOLD_ACT.git
+cd CFOLD_ACT
 ```
 
-The build arguments above match the development user to your host UID/GID for
-command-line bind-mount permissions. VS Code handles this mapping automatically
-when using its default build. For a shell with persistent source edits:
+Build the same development image, matching its non-root user to your host UID/GID
+so container-created files remain editable on Linux:
+
+```bash
+docker build \
+  --build-arg USER_UID="$(id -u)" \
+  --build-arg USER_GID="$(id -g)" \
+  -t cfold-act:dev .
+docker run --rm cfold-act:dev python --version
+docker run --rm cfold-act:dev uv --version
+```
+
+Start a development shell from the repository root:
 
 ```bash
 docker run --rm -it \
@@ -167,11 +179,43 @@ docker run --rm -it \
   'uv sync --locked --extra test && exec bash'
 ```
 
-Never bind-mount a host virtual environment over the container environment.
+Edit the repository with your host editor while this shell is open. The bind
+mount makes source changes visible immediately in both directions. Inside the
+container shell, run:
+
+```bash
+uv run pytest
+uv run python -m src.deploy --help
+uv run python -m src.cli train --stage 1 --print-config
+```
+
+For a single command without an interactive shell, mount the current checkout
+so the test run includes your latest edits:
+
+```bash
+docker run --rm \
+  --mount "type=bind,source=$PWD,target=/workspaces/CFOLD_ACT" \
+  cfold-act:dev bash -c 'uv sync --locked --extra test && uv run pytest'
+```
+
+Use `exit` to leave the shell. `--rm` removes that container, while source edits,
+outputs, and dependency-file changes in the mounted repository persist on the
+host. The built image remains available; rerun the shell command next time.
+Changes elsewhere in the container, including dependencies added to its virtual
+environment, disappear when it is removed. After `uv add` or dependency updates,
+commit the manifest/lockfile changes and repeat the UID/GID-aware build command
+above to bake the updated environment into the image. Source-only edits need
+no rebuild. Never bind-mount a host virtual environment over the container
+environment. Use Git from your host terminal as usual.
+
+If your `docker` command uses rootless Podman, add `--userns=keep-id` to each
+bind-mounted `docker run` command so the non-root user can write to the host
+checkout. This option is specific to Podman; omit it with Docker Engine/Desktop.
+These command-line instructions also work from a WSL Linux terminal.
 
 ## Dependencies, rebuilds and a second laptop
 
-Inside the standard Dev Container:
+Inside either the Dev Container or the command-line development shell:
 
 ```bash
 uv add PACKAGE_NAME
@@ -191,19 +235,22 @@ in the manifest and lockfile. The existing CPU PyTorch sources stay authoritativ
 After dependency or Dockerfile changes, select **Dev Containers: Rebuild
 Container**. Source-only changes need no rebuild. A restart synchronizes locked
 Python dependencies, but changing the base image or apt packages requires a
-rebuild. For command-line use, rerun `docker build -t cfold-act:dev .` and create
-a new container; existing containers do not update themselves.
+rebuild. For command-line use, repeat the UID/GID-aware build command in the
+section above and create a new container; existing containers do not update
+themselves.
 
 Commit work and share it through Git using your normal workflow. On laptop two,
 install the host prerequisites, clone the same branch/commit, and reopen in the
-container. For an existing checkout:
+container, or build and start the command-line shell above. For an existing
+checkout:
 
 ```bash
 git pull --ff-only
-code .
 ```
 
-Then select **Dev Containers: Rebuild Container**. Do not copy `.venv`, images,
+Then rebuild the image and start a new command-line shell. If using VS Code,
+run `code .` and select **Dev Containers: Rebuild Container** instead.
+Do not copy `.venv`, images,
 caches, or host Python packages between machines. Datasets, trained checkpoints,
 calibration files and credentials must be transferred/configured separately;
 keep secrets out of Git and image layers.

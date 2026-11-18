@@ -1,7 +1,19 @@
 from copy import deepcopy
+from pathlib import Path
 import pytest
 
 from src.config import load_robot, load_task
+
+
+@pytest.fixture(autouse=True)
+def isolated_camera_topology(monkeypatch):
+    """Keep synthetic camera paths independent of the host's real USB topology."""
+    def identity(device):
+        return str(Path(f'/dev/video{device}' if isinstance(device, int) else device).resolve())
+
+    # Containers expose host sysfs even without camera device passthrough.
+    # Path/symlink duplicate validation remains active for the fake devices.
+    monkeypatch.setattr('src.config.camera_identity', identity)
 
 
 @pytest.fixture

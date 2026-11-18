@@ -2,6 +2,18 @@
 
 A hierarchical imitation learning system for bimanual cloth folding using independently trained Action Chunking Transformer (ACT) policies.
 
+## Development environment
+
+For a shared Python 3.11 CPU environment on Windows/WSL2 and Linux, open this
+repository in VS Code and select **Dev Containers: Reopen in Container**.
+Docker builds the locked dependencies locally, including the test extra.
+Run `uv run pytest` in the container terminal.
+
+See [Docker and Dev Container setup](docs/docker-setup.md) for host installation,
+command-line usage, dependency updates, switching laptops, and optional NVIDIA
+GPU and robot device access. See [operations](docs/OPERATIONS.md) for application,
+training, recording, and hardware configuration commands.
+
 ## System Architecture
 
 ```text

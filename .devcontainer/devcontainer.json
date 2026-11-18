@@ -1,0 +1,31 @@
+{
+  "name": "CFOLD ACT (CPU)",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/CFOLD_ACT,type=bind",
+  "workspaceFolder": "/workspaces/CFOLD_ACT",
+  "containerUser": "vscode",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "postCreateCommand": "uv sync --locked --extra test",
+  "postStartCommand": "uv sync --locked --extra test",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python",
+        "python.terminal.activateEnvironment": false,
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.cwd": "${workspaceFolder}",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}
